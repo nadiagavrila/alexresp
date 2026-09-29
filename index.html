@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bifele mele</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bifele mele">
+<meta name="theme-color" content="#2F5BEA">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #EEF4FB;
+  --surface: #FFFFFF;
+  --ink: #16264A;
+  --muted: #5B6B8C;
+  --line: #D5E0F0;
+  --brand: #2F5BEA;
+  --brand-ink: #FFFFFF;
+  --done: #1FA971;
+  --done-soft: #DDF5EA;
+  --sun: #FFC53D;
+  --sun-ink: #4A3500;
+  --sun-soft: #FFF3D1;
+  --seg-a: #7FA6FF;
+  --seg-b: #A98BFF;
+  --seg-c: #FFC53D;
+  --seg-d: #B7C4DE;
+  --font-head: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1A33; --surface: #18274A; --ink: #EAF0FF; --muted: #9DB0D6; --line: #2A3B66;
+    --brand: #6C8CFF; --brand-ink: #0F1A33; --done: #3DD598; --done-soft: #16413A;
+    --sun-soft: #4A3F1B; --sun-ink: #FFE7A3;
+    --seg-a: #5573D6; --seg-b: #7D63D8; --seg-c: #E0AE2E; --seg-d: #3B4C78;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1A33; --surface: #18274A; --ink: #EAF0FF; --muted: #9DB0D6; --line: #2A3B66;
+  --brand: #6C8CFF; --brand-ink: #0F1A33; --done: #3DD598; --done-soft: #16413A;
+  --sun-soft: #4A3F1B; --sun-ink: #FFE7A3;
+  --seg-a: #5573D6; --seg-b: #7D63D8; --seg-c: #E0AE2E; --seg-d: #3B4C78;
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-weight: 500; font-size: 18px; line-height: 1.45;
+  -webkit-text-size-adjust: 100%;
+}
+main { max-width: 720px; margin: 0 auto; padding: 20px 16px 48px; }
+h1, h2 { font-family: var(--font-head); font-weight: 600; margin: 0; letter-spacing: 0.01em; }
+h1 { font-size: 34px; line-height: 1.1; }
+h2 { font-size: 22px; }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+
+header { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 16px; }
+.date { color: var(--muted); font-weight: 700; font-size: 16px; }
+
+/* week strip */
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 18px; }
+.day {
+  border: 2px solid var(--line); background: var(--surface); border-radius: 14px;
+  padding: 8px 0 8px; text-align: center; font-weight: 800; font-size: 16px;
+}
+.day .bar { display: block; height: 6px; margin: 6px 10px 0; border-radius: 3px; background: var(--line); overflow: hidden; }
+.day .bar i { display: block; height: 100%; background: var(--done); width: 0; }
+.day.today { border-color: var(--brand); }
+.day[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.day[aria-pressed="true"] .bar { background: rgba(255,255,255,.35); }
+.day[aria-pressed="true"] .bar i { background: var(--sun); }
+.day.future { opacity: .55; }
+
+/* progress */
+.progress { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+.ring { position: relative; width: 84px; height: 84px; flex: none; }
+.ring svg { transform: rotate(-90deg); }
+.ring .num { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--font-head); font-size: 24px; }
+.ring circle { fill: none; stroke-width: 10; }
+.ring .track { stroke: var(--line); }
+.ring .fill { stroke: var(--brand); stroke-linecap: round; transition: stroke-dashoffset .35s ease, stroke .35s ease; }
+.ring.all .fill { stroke: var(--done); }
+.progress p { margin: 0; font-weight: 700; }
+.progress .sub { color: var(--muted); font-weight: 500; font-size: 16px; }
+
+/* checklist */
+.group { margin-top: 18px; }
+.group h2 { margin-bottom: 8px; }
+.item {
+  display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+  background: var(--surface); border: 2px solid var(--line); border-radius: 16px;
+  padding: 14px 16px; margin-bottom: 8px; min-height: 64px;
+  transition: background .2s, border-color .2s;
+}
+.item .box {
+  flex: none; width: 34px; height: 34px; border-radius: 10px; border: 3px solid var(--muted);
+  display: grid; place-items: center; background: transparent; transition: background .2s, border-color .2s;
+}
+.item .box svg { width: 20px; height: 20px; stroke: #fff; stroke-width: 3.5; fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transform: scale(.6); transition: opacity .15s, transform .2s; }
+.item[aria-pressed="true"] { background: var(--done-soft); border-color: var(--done); }
+.item[aria-pressed="true"] .box { background: var(--done); border-color: var(--done); }
+.item[aria-pressed="true"] .box svg { opacity: 1; transform: scale(1); }
+.item[aria-pressed="true"] .label { color: var(--muted); }
+
+/* tablet card */
+.tablet {
+  margin-top: 24px; border-radius: 22px; padding: 20px; border: 2px dashed var(--line);
+  background: var(--surface); transition: background .3s, border-color .3s;
+}
+.tablet.open { background: var(--sun-soft); border: 2px solid var(--sun); color: var(--sun-ink); }
+.tablet h2 { margin-bottom: 6px; }
+.tablet p { margin: 0 0 12px; }
+.tablet .muted { color: var(--muted); }
+.tablet.open .muted { color: var(--sun-ink); opacity: .8; }
+.countdown { font-family: var(--font-head); font-size: 52px; line-height: 1; margin: 4px 0 8px; font-variant-numeric: tabular-nums; }
+.btn {
+  border: 0; border-radius: 14px; padding: 14px 22px; font-weight: 800; font-size: 18px;
+  background: var(--brand); color: var(--brand-ink); min-height: 52px;
+}
+.btn.sun { background: var(--sun); color: var(--sun-ink); }
+.btn.ghost { background: transparent; border: 2px solid var(--line); color: var(--muted); font-weight: 700; font-size: 16px; min-height: 44px; padding: 8px 16px; }
+.tablet.open .btn { background: var(--sun-ink); color: var(--sun-soft); }
+
+/* plan */
+.plan { margin-top: 24px; background: var(--surface); border: 2px solid var(--line); border-radius: 22px; padding: 20px; }
+.plan h2 { margin-bottom: 4px; }
+.plan .hint { color: var(--muted); font-size: 16px; margin: 0 0 14px; }
+.fields { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; }
+.field label { display: block; font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+.field input[type="time"] {
+  border: 2px solid var(--line); border-radius: 12px; padding: 8px 12px; background: var(--bg); min-height: 48px; font-weight: 800;
+}
+.timeline { display: flex; height: 22px; border-radius: 11px; overflow: hidden; margin-bottom: 12px; background: var(--seg-d); }
+.timeline span { display: block; height: 100%; }
+.steps { list-style: none; margin: 0; padding: 0; }
+.steps li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.steps li:last-child { border-bottom: 0; }
+.steps .dot { width: 14px; height: 14px; border-radius: 50%; flex: none; }
+.steps .t { font-weight: 800; font-variant-numeric: tabular-nums; min-width: 128px; }
+.note { margin: 12px 0 0; padding: 10px 14px; border-radius: 12px; background: var(--sun-soft); color: var(--sun-ink); font-weight: 700; font-size: 16px; }
+
+/* proud */
+.proud { margin-top: 24px; }
+.proud label { display: block; font-family: var(--font-head); font-size: 22px; margin-bottom: 8px; }
+.proud textarea {
+  width: 100%; min-height: 84px; border: 2px solid var(--line); border-radius: 16px; padding: 12px 14px;
+  background: var(--surface); resize: vertical;
+}
+.foot { margin-top: 24px; display: flex; justify-content: flex-end; }
+
+@media (max-width: 520px) {
+  body { font-size: 17px; }
+  h1 { font-size: 28px; }
+  .day { font-size: 14px; }
+  .steps .t { min-width: 112px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Bifele mele</h1>
+      <div class="date" id="date"></div>
+    </div>
+  </header>
+
+  <nav class="week" id="week" aria-label="Zilele săptămânii"></nav>
+
+  <section class="progress" aria-live="polite">
+    <div class="ring" id="ring">
+      <svg width="84" height="84" viewBox="0 0 84 84" aria-hidden="true">
+        <circle class="track" cx="42" cy="42" r="36"></circle>
+        <circle class="fill" id="ringFill" cx="42" cy="42" r="36" stroke-dasharray="226.19" stroke-dashoffset="226.19"></circle>
+      </svg>
+      <div class="num" id="ringNum">0/0</div>
+    </div>
+    <div>
+      <p id="progTitle"></p>
+      <p class="sub" id="progSub"></p>
+    </div>
+  </section>
+
+  <div id="lists"></div>
+
+  <section class="tablet" id="tablet" aria-live="polite"></section>
+
+  <section class="plan" aria-labelledby="planTitle">
+    <h2 id="planTitle">Planul meu de timp</h2>
+    <p class="hint" id="planHint"></p>
+    <div class="fields">
+      <div class="field"><label for="startT" id="startLbl">Încep la</label><input type="time" id="startT"></div>
+      <div class="field"><label for="bedT">Pat la</label><input type="time" id="bedT"></div>
+    </div>
+    <div class="timeline" id="timeline" role="img" aria-label="Ziua mea pe ore"></div>
+    <ul class="steps" id="steps"></ul>
+    <div class="note" id="planNote" hidden></div>
+  </section>
+
+  <section class="proud">
+    <label for="proudT">Săptămâna asta sunt mândru de mine pentru:</label>
+    <textarea id="proudT" placeholder="Scrie aici ce ți-a ieșit bine"></textarea>
+  </section>
+
+  <div class="foot"><button class="btn ghost" id="resetBtn" type="button">Șterge bifele zilei</button></div>
+</main>
+
+<script>
+(function () {
+  var DAYS = ["Lu", "Ma", "Mi", "Jo", "Vi", "Sâ", "Du"];
+  var DAY_FULL = ["luni", "marți", "miercuri", "joi", "vineri", "sâmbătă", "duminică"];
+  var MONTHS = ["ianuarie","februarie","martie","aprilie","mai","iunie","iulie","august","septembrie","octombrie","noiembrie","decembrie"];
+
+
+  /* =====================================================================
+     SETĂRI: aici schimbi tu lucrurile. Restul codului nu trebuie atins.
+     ===================================================================== */
+
+  // Lista de bife. Zilele: 0=luni, 1=marți, 2=miercuri, 3=joi, 4=vineri, 5=sâmbătă, 6=duminică.
+  // "id" trebuie să fie unic și fără spații. Dacă îl schimbi, bifele vechi ale acelei zile se pierd.
+  // "zile" (opțional): bifa apare doar în zilele din listă. Fără "zile", apare în toate.
+  // "textWeekend" (opțional): alt text pentru sâmbătă și duminică.
+  var BIFE = {
+    "După școală": [
+      { id: "bag",    text: "Ghiozdanul și hainele de școală la locul lor", zile: [0, 1, 2, 3, 4] },
+      { id: "snack",  text: "Gustare, apoi farfuria la chiuvetă" },
+      { id: "out",    text: "Afară 1h30", textWeekend: "Afară 3 ore" }
+    ],
+    "Seara": [
+      { id: "shower",  text: "Duș și spălat pe cap" },
+      { id: "teeth",   text: "Spălat pe dinți" },
+      { id: "clothes", text: "Hainele murdare în coș, cele curate la loc" },
+      { id: "room",    text: "Camera în ordine (5 minute)" },
+      { id: "recycle", text: "Reciclabilele separate" },
+      { id: "bag2",    text: "Ghiozdanul pregătit pentru mâine", zile: [6, 0, 1, 2, 3] }
+    ]
+  };
+
+  // Orele implicite (le poate schimba și copilul din pagină).
+  var ORE = {
+    scoala:  { start: "16:30", bed: "20:30" },
+    weekend: { start: "10:00", bed: "21:00" }
+  };
+
+  // Durate în minute.
+  var DURATE = {
+    afaraScoala: 90,     // afară într-o zi de școală
+    afaraWeekend: 180,   // afară în weekend
+    bifeSiMasa: 60,      // bife, duș și masă
+    tableta: 60,         // tableta
+    inainteDePat: 30     // tableta se oprește cu atâtea minute înainte de ora de pat
+  };
+  /* ===================== sfârșit setări ===================== */
+
+  // storage helpers (never assume storage works)
+  function sGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } }
+  function sSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  var memory = {};
+
+  function keyOf(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function wIdx(d) { return (d.getDay() + 6) % 7; } // 0 = luni
+  function mondayOf(d) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - wIdx(x)); return x; }
+  function pad(n) { return String(n).padStart(2, "0"); }
+  function toMin(s) { var p = (s || "0:0").split(":"); return (+p[0]) * 60 + (+p[1]); }
+  function fmt(m) { m = ((m % 1440) + 1440) % 1440; return pad(Math.floor(m / 60)) + ":" + pad(m % 60); }
+
+  var today = new Date();
+  var view = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  var monday = mondayOf(today);
+
+  function itemsFor(wi) {
+    var weekend = wi >= 5;
+    return Object.keys(BIFE).map(function (nume) {
+      var items = BIFE[nume].filter(function (b) { return !b.zile || b.zile.indexOf(wi) !== -1; })
+        .map(function (b) { return { id: b.id, t: (weekend && b.textWeekend) ? b.textWeekend : b.text }; });
+      return { name: nume, items: items };
+    });
+  }
+  function flat(wi) { var out = []; itemsFor(wi).forEach(function (g) { g.items.forEach(function (i) { out.push(i); }); }); return out; }
+  function doneOf(d) { return sGet("bife:" + keyOf(d), []); }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var isToday = function () { return keyOf(view) === keyOf(today); };
+
+  /* ---------- week strip ---------- */
+  function renderWeek() {
+    var html = "";
+    for (var i = 0; i < 7; i++) {
+      var d = new Date(monday); d.setDate(monday.getDate() + i);
+      var total = flat(i).length, done = doneOf(d).length;
+      var pct = Math.min(100, Math.round(done / total * 100));
+      var cls = "day" + (keyOf(d) === keyOf(today) ? " today" : "") + (d > today && keyOf(d) !== keyOf(today) ? " future" : "");
+      var sel = keyOf(d) === keyOf(view);
+      html += '<button type="button" class="' + cls + '" data-d="' + keyOf(d) + '" aria-pressed="' + sel + '" aria-label="' + DAY_FULL[i] + ', ' + done + ' din ' + total + ' bife">' +
+        DAYS[i] + '<span class="bar"><i style="width:' + pct + '%"></i></span></button>';
+    }
+    $("week").innerHTML = html;
+  }
+  $("week").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-d]"); if (!b) return;
+    var p = b.getAttribute("data-d").split("-");
+    view = new Date(+p[0], +p[1] - 1, +p[2]);
+    renderAll();
+  });
+
+  /* ---------- checklist ---------- */
+  function renderLists() {
+    var wi = wIdx(view), done = doneOf(view), html = "";
+    itemsFor(wi).forEach(function (g) {
+      html += '<div class="group"><h2>' + g.name + '</h2>';
+      g.items.forEach(function (it) {
+        var on = done.indexOf(it.id) !== -1;
+        html += '<button type="button" class="item" data-id="' + it.id + '" aria-pressed="' + on + '">' +
+          '<span class="box"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' +
+          '<span class="label">' + it.t + '</span></button>';
+      });
+      html += "</div>";
+    });
+    $("lists").innerHTML = html;
+  }
+  $("lists").addEventListener("click", function (e) {
+    var b = e.target.closest(".item"); if (!b) return;
+    var id = b.getAttribute("data-id"), k = "bife:" + keyOf(view), done = doneOf(view).slice();
+    var ix = done.indexOf(id);
+    if (ix === -1) done.push(id); else done.splice(ix, 1);
+    sSet(k, done);
+    renderAll();
+    var again = document.querySelector('.item[data-id="' + id + '"]'); if (again) again.focus({ preventScroll: true });
+  });
+
+  /* ---------- progress ---------- */
+  function renderProgress() {
+    var total = flat(wIdx(view)).length, done = doneOf(view).length;
+    var C = 226.19;
+    $("ringFill").setAttribute("stroke-dashoffset", String(C * (1 - done / total)));
+    $("ring").className = "ring" + (done === total ? " all" : "");
+    $("ringNum").textContent = done + "/" + total;
+    var left = total - done;
+    $("progTitle").textContent = left === 0 ? "Toate bifele sunt făcute!" : (done === 0 ? "Hai să începem" : "Mai ai " + left + (left === 1 ? " bifă" : " bife"));
+    $("progSub").textContent = left === 0 ? "Bravo, ai câștigat tableta." : "Când le termini pe toate, se deschide tableta.";
+  }
+
+  /* ---------- tablet ---------- */
+  var tick = null;
+  function tabletEnd() { var s = sGet("tablet:end", null); return s && s.day === keyOf(today) ? s.at : null; }
+  function renderTablet() {
+    var el = $("tablet"), total = flat(wIdx(view)).length, done = doneOf(view).length;
+    if (tick) { clearInterval(tick); tick = null; }
+    var plan = computePlan();
+    var mins = plan.tabletMin;
+    if (done < total) {
+      el.className = "tablet";
+      el.innerHTML = '<h2>Tableta</h2><p class="muted">Se deschide după ultima bifă. Mai ai ' + (total - done) + (total - done === 1 ? " bifă." : " bife.") + '</p>';
+      return;
+    }
+    if (!isToday()) {
+      el.className = "tablet open";
+      el.innerHTML = '<h2>Ziua asta a fost completă</h2><p class="muted">Toate bifele au fost făcute.</p>';
+      return;
+    }
+    var end = tabletEnd();
+    if (end && end > Date.now()) {
+      el.className = "tablet open";
+      el.innerHTML = '<h2>Tableta merge</h2><div class="countdown" id="cd"></div><p class="muted">Se oprește la ' + fmt(new Date(end).getHours() * 60 + new Date(end).getMinutes()) + '.</p><button class="btn" id="stopBtn" type="button">Am terminat mai devreme</button>';
+      var upd = function () {
+        var r = Math.max(0, Math.round((end - Date.now()) / 1000));
+        var c = $("cd"); if (c) c.textContent = pad(Math.floor(r / 60)) + ":" + pad(r % 60);
+        if (r <= 0) { sSet("tablet:end", null); renderTablet(); }
+      };
+      upd(); tick = setInterval(upd, 1000);
+      $("stopBtn").onclick = function () { sSet("tablet:end", null); renderTablet(); };
+      return;
+    }
+    if (end) {
+      el.className = "tablet open";
+      el.innerHTML = '<h2>Timpul s-a terminat</h2><p>Oprește tableta și las-o la încărcat.</p>';
+      return;
+    }
+    el.className = "tablet open";
+    el.innerHTML = '<h2>Tableta e a ta: ' + (mins === 60 ? "1 oră" : mins + " minute") + '</h2><p class="muted">Apasă când o pornești. Cronometrul îți arată cât ai mai rămas.</p><button class="btn" id="goBtn" type="button">Pornesc tableta</button>';
+    $("goBtn").onclick = function () { sSet("tablet:end", { day: keyOf(today), at: Date.now() + mins * 60000 }); renderTablet(); };
+  }
+
+  /* ---------- plan ---------- */
+  function planKey() { return wIdx(view) >= 5 ? "weekend" : "scoala"; }
+  function planVals() {
+    var wk = planKey() === "weekend";
+    var s = sGet("plan:" + planKey(), null);
+    return s || (wk ? ORE.weekend : ORE.scoala);
+  }
+  function computePlan() {
+    var v = planVals(), wk = planKey() === "weekend";
+    var start = toMin(v.start), bed = toMin(v.bed);
+    var outMin = wk ? DURATE.afaraWeekend : DURATE.afaraScoala, routineMin = DURATE.bifeSiMasa, wind = DURATE.inainteDePat;
+    var out = start + outMin, tabS = out + routineMin;
+    var latest = bed - wind;
+    var tabMin = Math.max(0, Math.min(DURATE.tableta, latest - tabS));
+    return { start: start, bed: bed, out: out, tabS: tabS, tabMin: tabMin, outMin: outMin, routineMin: routineMin, wind: wind, full: tabMin === DURATE.tableta, wk: wk };
+  }
+  function renderPlan() {
+    var p = computePlan(), wk = p.wk;
+    $("planHint").textContent = wk ? "Weekend: afară, apoi bife și masă, apoi tableta." : "Zi de școală: afară, apoi bife, duș și masă, apoi tableta.";
+    $("startLbl").textContent = wk ? "Încep ziua la" : "Ajung acasă la";
+    var segs = [
+      { t: "Afară", a: p.start, b: p.out, c: "var(--seg-a)" },
+      { t: "Bife, duș și masă", a: p.out, b: p.tabS, c: "var(--seg-b)" },
+      { t: "Tabletă", a: p.tabS, b: p.tabS + p.tabMin, c: "var(--seg-c)" },
+      { t: "Pregătit de culcare", a: p.tabS + p.tabMin, b: p.bed, c: "var(--seg-d)" }
+    ].filter(function (s) { return s.b > s.a; });
+    var span = Math.max(1, p.bed - p.start);
+    var tl = "", li = "";
+    segs.forEach(function (s) {
+      tl += '<span style="width:' + ((s.b - s.a) / span * 100) + '%;background:' + s.c + '"></span>';
+      li += '<li><span class="dot" style="background:' + s.c + '"></span><span class="t">' + fmt(s.a) + " – " + fmt(s.b) + '</span><span>' + s.t + '</span></li>';
+    });
+    li += '<li><span class="dot" style="background:var(--ink)"></span><span class="t">' + fmt(p.bed) + '</span><span>Pat</span></li>';
+    $("timeline").innerHTML = tl;
+    $("steps").innerHTML = li;
+    var note = $("planNote");
+    if (p.tabMin === 0) {
+      note.hidden = false;
+      note.textContent = "Nu mai rămâne loc pentru tabletă azi. Somnul nu se scurtează, așa că tableta așteaptă până mâine.";
+    } else if (!p.full) {
+      note.hidden = false;
+      note.textContent = "Nu încape tot timpul de tabletă: durează doar " + p.tabMin + " min. Somnul nu se scurtează.";
+    } else { note.hidden = true; }
+  }
+  function onPlanChange() {
+    sSet("plan:" + planKey(), { start: $("startT").value || planVals().start, bed: $("bedT").value || planVals().bed });
+    renderPlan(); renderTablet();
+  }
+  $("startT").addEventListener("change", onPlanChange);
+  $("bedT").addEventListener("change", onPlanChange);
+
+  /* ---------- proud ---------- */
+  var proudKey = "proud:" + keyOf(monday);
+  $("proudT").value = sGet(proudKey, "");
+  var pt = null;
+  $("proudT").addEventListener("input", function () { clearTimeout(pt); pt = setTimeout(function () { sSet(proudKey, $("proudT").value); }, 300); });
+
+  /* ---------- reset ---------- */
+  var armed = false, armT = null;
+  $("resetBtn").addEventListener("click", function () {
+    if (!armed) {
+      armed = true; $("resetBtn").textContent = "Sigur? Apasă încă o dată";
+      armT = setTimeout(function () { armed = false; $("resetBtn").textContent = "Șterge bifele zilei"; }, 4000);
+      return;
+    }
+    clearTimeout(armT); armed = false; $("resetBtn").textContent = "Șterge bifele zilei";
+    sSet("bife:" + keyOf(view), []);
+    renderAll();
+  });
+
+  /* ---------- date + render ---------- */
+  function renderDate() {
+    var wi = wIdx(view);
+    var name = DAY_FULL[wi].charAt(0).toUpperCase() + DAY_FULL[wi].slice(1);
+    $("date").textContent = name + ", " + view.getDate() + " " + MONTHS[view.getMonth()] + (isToday() ? "" : " (nu e azi)");
+  }
+  function syncPlanInputs() { var v = planVals(); $("startT").value = v.start; $("bedT").value = v.bed; }
+  function renderAll() {
+    renderDate(); renderWeek(); renderProgress(); renderLists(); syncPlanInputs(); renderPlan(); renderTablet();
+  }
+  renderAll();
+})();
+</script>
+</body>
+</html>
